@@ -18,7 +18,7 @@ python app.py
 
 ## Low-Fidelity Mockup
 
-You can find the skeleton of the future app [here]('https://www.figma.com/file/sCU4n4i3felNCzD73lxvFe/Low-fidelity-mockup?node-id=1%3A6).
+You can find the skeleton of the future app [here](https://www.figma.com/file/sCU4n4i3felNCzD73lxvFe/Low-fidelity-mockup?node-id=1%3A6).
 
 ## Roadmap
 
