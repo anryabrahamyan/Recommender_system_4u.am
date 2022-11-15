@@ -1,22 +1,13 @@
 import pandas as pd
-import csv
 import requests
-import cv2
 from os import path
 import urllib.parse
 import numpy as np
 from PIL import Image
-from io import StringIO
 from tensorflow.keras.applications.resnet50 import ResNet50
-from transformers import BertTokenizer, BertForSequenceClassification, RobertaTokenizer, TFRobertaModel, pipeline
+from transformers import RobertaTokenizer, TFRobertaModel
 import os
-import math
-
-from sklearn.preprocessing import MinMaxScaler
-
 import tensorflow as tf
-from transformers import BertTokenizer
-from sklearn.metrics.pairwise import cosine_similarity
 from pathlib import Path
 
 
@@ -25,7 +16,7 @@ IMAGES_PATH = current_address.parents[1] / "data" / 'images'
 if not os.path.isdir(IMAGES_PATH):
     os.mkdir(IMAGES_PATH)
 
-DATA_PATH = current_address.parents[1] / 'data' / 'data.csv'
+DATA_PATH = current_address.parents[1] / 'data'
 data = pd.read_csv(DATA_PATH)
 MODEL_NAME = "roberta-base"
 MAX_LEN = 200
@@ -57,8 +48,7 @@ def vectorize_images():
     for i in range(len(lst_)):
         m = model(tf.expand_dims(lst_[i],0))
         ar = np.concatenate([ar,m])
-    with open('/arr_images.npy', 'wb') as f:
-        np.save(f,ar)
+    return ar
 
 
 def roberta_encode(texts, tokenizer):
@@ -89,111 +79,53 @@ def roberta_encode(texts, tokenizer):
         'input_type_ids': token_type_ids
     }
 
-#
-# def build_model():
-#     input_word_ids = tf.keras.Input(shape=(MAX_LEN,), dtype=tf.int32, name='input_word_ids')
-#     input_mask = tf.keras.Input(shape=(MAX_LEN,), dtype=tf.int32, name='input_mask')
-#     input_type_ids = tf.keras.Input(shape=(MAX_LEN,), dtype=tf.int32, name='input_type_ids')
-#
-#     # Import RoBERTa model from HuggingFace
-#     roberta_model = TFRobertaModel.from_pretrained(MODEL_NAME)
-#     x = roberta_model(input_word_ids, attention_mask=input_mask, token_type_ids=input_type_ids)
-#
-#     # Huggingface transformers have multiple outputs, embeddings are the first one,
-#     # so let's slice out the first position
-#     x = x[0]
-#
-#     model = tf.keras.Model(inputs=[input_word_ids, input_mask, input_type_ids], outputs=x)
-#     model.compile(
-#         optimizer=tf.keras.optimizers.Adam(lr=1e-4),
-#         loss='sparse_categorical_crossentropy',
-#         metrics=['accuracy'])
-#
-#     return model
-#
-# def vectorize_name_description():
-#     tokenizer = RobertaTokenizer.from_pretrained(MODEL_NAME)
-#
-#     name = data["product"]
-#     description = data["item description"]
-#     description.fillna('',inplace=True)
-#     encoded_product_name = roberta_encode(name, tokenizer)
-#     encoded_product_desc = roberta_encode(description, tokenizer)
-#
-# model = build_model()
-#
-# output_name = model.predict(encoded_product_name)
-# output_name_reduced = np.sum(output_name,axis = 2)
-#
-# output_desc = model.predict(encoded_product_desc)
-# output_desc_reduced = np.sum(output_desc,axis = 2)
-#
-# with open('arr_text_names.npy', 'wb') as f:
-#     np.save(f,output_name_reduced)
-#
-# with open('arr_text_descriptions.npy', 'wb') as f:
-#     np.save(f,output_desc_reduced)
-#
-# def calculate_price_diff(row_rec,df):
-#     price_diff = df['price'].apply(lambda x:(np.exp((x-row_rec['price'])/df['price'].max())))
-#     return price_diff
-#
-# pr = pd.DataFrame.from_dict({'price':[10000]},)
-# prices = calculate_price_diff(pr,data)
-#
-# def make_store_and_brand_binary(row,df):
-#     store = row['store']
-#     brand = row['brand']
-#     store_match = (df['store']==store).astype(int)
-#     brand_match = (df['brand']==brand).astype(int)
-#     total_match = pd.concat([store_match,brand_match],axis = 1)
-#     return total_match
-#
-# df = make_store_and_brand_binary(data.iloc[0], data)
-#
-#
-# def compute_cosine(vec_rec, matrix):
-#     cos_df = cosine_similarity([vec_rec], matrix)
-#     cos_df = np.squeeze(cos_df)
-#
-#     return cos_df
-#
-# with open('./arr_text_names.npy','rb') as f:
-#     arr = np.load(f)
-# row = arr[0,:]
-# names = compute_cosine(row,arr)
-#
-# with open('./arr_text_descriptions.npy', 'rb') as f:
-#     arr = np.load(f)
-#
-# row = arr[0, :]
-# descriptions = compute_cosine(row, arr)
-#
-# with open('./arr_images.npy', 'rb') as f:
-#     arr = np.load(f)
-#
-# row = arr[0, :]
-#
-# data_ = data[~data["image url"].duplicated()]['image url']
-# image_to_cosine_sim_dict = {image_name:img_array for image_name,img_array in zip(data_.to_numpy(),images)}
-# df['image similarities'] = data['image url'].map(image_to_cosine_sim_dict)
-#
-# df["names"] = names
-# df["descriptions"] = descriptions
-# df["prices"] = prices
-#
-# scaler = MinMaxScaler()
-# df = pd.DataFrame(scaler.fit_transform(df,),columns=df.columns)
-#
-# weights = [1/6]*6
-# df['weighted_sum'] = df["store"]*weights[0] + df["brand"]*weights[1] +df["names"]*weights[2] +df["descriptions"]*weights[3] +df["image similarities"]*weights[4] + df["prices"]*weights[5]
-#
-# df["weighted_sum"].sort_values(ascending = False)
-#
-# top5 = df["weighted_sum"].sort_values(ascending = False).index[:5]
-# data.iloc[top5]
-# images = compute_cosine(row, arr)
+
+def build_model():
+    input_word_ids = tf.keras.Input(shape=(MAX_LEN,), dtype=tf.int32, name='input_word_ids')
+    input_mask = tf.keras.Input(shape=(MAX_LEN,), dtype=tf.int32, name='input_mask')
+    input_type_ids = tf.keras.Input(shape=(MAX_LEN,), dtype=tf.int32, name='input_type_ids')
+
+    # Import RoBERTa model from HuggingFace
+    roberta_model = TFRobertaModel.from_pretrained(MODEL_NAME)
+    x = roberta_model(input_word_ids, attention_mask=input_mask, token_type_ids=input_type_ids)
+
+    # Huggingface transformers have multiple outputs, embeddings are the first one,
+    # so let's slice out the first position
+    x = x[0]
+
+    model = tf.keras.Model(inputs=[input_word_ids, input_mask, input_type_ids], outputs=x)
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(lr=1e-4),
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy'])
+
+    return model
+
+def vectorize_name_description():
+    tokenizer = RobertaTokenizer.from_pretrained(MODEL_NAME)
+
+    name = data["product"]
+    description = data["item description"]
+    description.fillna('',inplace=True)
+    encoded_product_name = roberta_encode(name, tokenizer)
+    encoded_product_desc = roberta_encode(description, tokenizer)
+    return encoded_product_name, encoded_product_desc
+
+model = build_model()
+
+def create_data():
+
+    with open(DATA_PATH / 'arr_images.npy', 'wb') as f:
+        np.save(f, vectorize_images())
+
+    with open(DATA_PATH /'arr_text_names.npy', 'wb') as f:
+        np.save(f, vectorize_name_description()[1])
+
+    with open(DATA_PATH / 'arr_text_descriptions.npy', 'wb') as f:
+        np.save(f, vectorize_name_description()[0])
+
 
 if __name__ == '__main__':
     # download_images(data)
-    vectorize_images()
+    # vectorize_images()
+    create_data()
