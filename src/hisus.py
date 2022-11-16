@@ -17,7 +17,7 @@ if not os.path.isdir(IMAGES_PATH):
     os.mkdir(IMAGES_PATH)
 
 DATA_PATH = current_address.parents[1] / 'data'
-data = pd.read_csv(DATA_PATH)
+data = pd.read_csv(DATA_PATH/'data.csv')
 MODEL_NAME = "roberta-base"
 MAX_LEN = 200
 
@@ -101,20 +101,31 @@ def build_model():
 
     return model
 
-def vectorize_name_description():
+def vectorize_name_description(data = data):
     tokenizer = RobertaTokenizer.from_pretrained(MODEL_NAME)
 
     name = data["product"]
     description = data["item description"]
-    description.fillna('',inplace=True)
+    try:
+        description.fillna('',inplace=True)
+    except:
+        print('predicting only for 1 row')
+
     encoded_product_name = roberta_encode(name, tokenizer)
     encoded_product_desc = roberta_encode(description, tokenizer)
-    return encoded_product_name, encoded_product_desc
+
+    output_name = model.predict(encoded_product_name)
+    output_name_reduced = np.sum(output_name,axis = 2)
+
+    print(encoded_product_desc)
+    output_desc = model.predict(encoded_product_desc)
+    output_desc_reduced = np.sum(output_desc,axis = 2)
+
+    return output_name_reduced, output_desc_reduced
 
 model = build_model()
 
 def create_data():
-
     with open(DATA_PATH / 'arr_images.npy', 'wb') as f:
         np.save(f, vectorize_images())
 
