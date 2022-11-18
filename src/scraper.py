@@ -93,10 +93,9 @@ def extract_item_info(category_names):
 
 if __name__=='__main__':
     file_loc = Path(__file__).parent / 'data'
-    #TODO missing category URLS
     category_names =  get_category_names()
     data = extract_item_info(category_names)
-    pd.DataFrame(data).to_csv("data.csv",index=False)
+    pd.DataFrame(data).to_csv("data/data.csv",index=False)
     """
     sample output:
         [{'product': 'Մատանի «DF Project» արծաթյա №14',
