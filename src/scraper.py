@@ -16,6 +16,7 @@ from pathlib import Path
 
 import grequests
 from bs4 import BeautifulSoup
+import pandas as pd
 
 usable_cpus = (os.cpu_count() // 2) -1
 
@@ -95,9 +96,7 @@ if __name__=='__main__':
     #TODO missing category URLS
     category_names =  get_category_names()
     data = extract_item_info(category_names)
-
-    with open("data.pkl", "wb") as f:
-        pickle.dump(data,f)
+    pd.DataFrame(data).to_csv("data.csv",index=False)
     """
     sample output:
         [{'product': 'Մատանի «DF Project» արծաթյա №14',
