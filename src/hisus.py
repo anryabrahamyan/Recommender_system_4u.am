@@ -18,6 +18,12 @@ if not os.path.isdir(IMAGES_PATH):
 
 DATA_PATH = current_address.parents[1] / 'data'
 data = pd.read_csv(DATA_PATH/'data.csv')
+data = data.dropna()
+data["item description"] = data["item description"].apply(lambda x : x.replace("\n\n\n", " "))
+data["item description"] = data["item description"].apply(lambda x : x.replace("\n", " "))
+data["item description"] = data["item description"].apply(lambda x : x.replace("\n\n", " "))
+data["item description"] = data["item description"].apply(lambda x : x.replace("\\", ""))
+
 MODEL_NAME = "roberta-base"
 MAX_LEN = 200
 
@@ -52,6 +58,7 @@ def vectorize_images():
 
 
 def roberta_encode(texts, tokenizer):
+    print(texts)
     ct = len(texts)
     input_ids = np.ones((ct, MAX_LEN), dtype='int32')
     attention_mask = np.zeros((ct, MAX_LEN), dtype='int32')
