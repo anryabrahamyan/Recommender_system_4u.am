@@ -58,7 +58,6 @@ def vectorize_images():
 
 
 def roberta_encode(texts, tokenizer):
-    print(texts)
     ct = len(texts)
     input_ids = np.ones((ct, MAX_LEN), dtype='int32')
     attention_mask = np.zeros((ct, MAX_LEN), dtype='int32')
@@ -124,7 +123,6 @@ def vectorize_name_description(data = data):
     output_name = model.predict(encoded_product_name)
     output_name_reduced = np.sum(output_name,axis = 2)
 
-    print(encoded_product_desc)
     output_desc = model.predict(encoded_product_desc)
     output_desc_reduced = np.sum(output_desc,axis = 2)
 
@@ -144,6 +142,6 @@ def create_data():
 
 
 if __name__ == '__main__':
-    # download_images(data)
+    download_images(data)
     # vectorize_images()
     create_data()
