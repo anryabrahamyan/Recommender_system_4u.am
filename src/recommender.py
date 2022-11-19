@@ -1,5 +1,5 @@
 from pathlib import Path
-from hisus import build_model, roberta_encode, vectorize_name_description
+from create_recommendation_dataset import build_model, roberta_encode, vectorize_name_description
 
 import numpy as np
 import pandas as pd
