@@ -59,7 +59,6 @@ Finally to get the recommended 5 products for each product
 python src/recommender.py
 ```
 
-The Figma Design Link https://www.figma.com/file/CreZVKPt76Gb8v86KLdRwE/Group-5-Roadmap?node-id=307%3A9&t=Kk8LqL4gd7vYrCoP-1
 
 (In the recommender.py’s main function the product for which you’ll get the recommendations is the first product in our 
 data, in order to change it, just put your desired number(0-296) instead of 0 in
@@ -67,3 +66,4 @@ data, in order to change it, just put your desired number(0-296) instead of 0 in
 ```python 
 print(rec.predict(0)) 
 ```
+The Figma Design Link https://www.figma.com/file/CreZVKPt76Gb8v86KLdRwE/Group-5-Roadmap?node-id=307%3A9&t=Kk8LqL4gd7vYrCoP-1
