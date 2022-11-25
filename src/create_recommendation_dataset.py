@@ -1,3 +1,6 @@
+"""
+File for Generating the data necessart for recommender class
+"""
 import pandas as pd
 import requests
 from os import path
@@ -29,6 +32,13 @@ MAX_LEN = 200
 
 
 def download_images(data):
+    """Download the images from the links stored in the dataset csv
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+        DataFrame created by the scraping script
+    """
     for i in data["image url"]:
         img_data = requests.get(i).content
         url_parts = urllib.parse.urlparse(i)
@@ -40,6 +50,13 @@ def download_images(data):
             handler.write(img_data)
 
 def vectorize_images():
+    """convert images into vectors using a CNN
+
+    Returns
+    -------
+    np.ndarray
+        array of all of the vectors
+    """
     lst = []
     for image in os.listdir(IMAGES_PATH):
         i = Image.open(IMAGES_PATH / image)
@@ -58,6 +75,21 @@ def vectorize_images():
 
 
 def roberta_encode(texts, tokenizer):
+    """function used for encoding the texts given a tokenizer
+
+    Parameters
+    ----------
+    texts : pd.Series[str]
+        columns of texts to be encoded
+    tokenizer : transformers tokenizer
+        Tokenizer for preparing the inputs for the appropriate model
+        as input
+
+    Returns
+    -------
+    Dict[str,np.ndarray]
+        Encodings returned by hte tokenizer
+    """
     ct = len(texts)
     input_ids = np.ones((ct, MAX_LEN), dtype='int32')
     attention_mask = np.zeros((ct, MAX_LEN), dtype='int32')
@@ -87,6 +119,13 @@ def roberta_encode(texts, tokenizer):
 
 
 def build_model():
+    """Create the model for vectorizing texts
+
+    Returns
+    -------
+    tf.Model
+        model for predictions on the texts
+    """
     input_word_ids = tf.keras.Input(shape=(MAX_LEN,), dtype=tf.int32, name='input_word_ids')
     input_mask = tf.keras.Input(shape=(MAX_LEN,), dtype=tf.int32, name='input_mask')
     input_type_ids = tf.keras.Input(shape=(MAX_LEN,), dtype=tf.int32, name='input_type_ids')
@@ -108,6 +147,19 @@ def build_model():
     return model
 
 def vectorize_name_description(data = data):
+    """function used for vectorizing name and description
+    columns of the data
+
+    Parameters
+    ----------
+    data : pd.DataFrame, optional
+        The dataset which has the appropriate columns, by default data
+
+    Returns
+    -------
+    [np.ndarray,np.ndarray]
+        The name and description columns in vectorized form
+    """
     tokenizer = RobertaTokenizer.from_pretrained(MODEL_NAME)
 
     name = data["product"]
@@ -131,17 +183,19 @@ def vectorize_name_description(data = data):
 model = build_model()
 
 def create_data():
+    """
+    Create the Existing data that will be used by the recommender class
+    """
     with open(DATA_PATH / 'arr_images.npy', 'wb') as f:
         np.save(f, vectorize_images())
-
+    vectors_name_desc = vectorize_name_description()
     with open(DATA_PATH /'arr_text_names.npy', 'wb') as f:
-        np.save(f, vectorize_name_description()[1])
+        np.save(f, vectors_name_desc[1])
 
     with open(DATA_PATH / 'arr_text_descriptions.npy', 'wb') as f:
-        np.save(f, vectorize_name_description()[0])
+        np.save(f, vectors_name_desc[0])
 
 
 if __name__ == '__main__':
     download_images(data)
-    # vectorize_images()
     create_data()
