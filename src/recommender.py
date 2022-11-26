@@ -1,13 +1,15 @@
+"""
+Class implementing the recommendation logic
+"""
 from pathlib import Path
-from create_recommendation_dataset import build_model, roberta_encode, vectorize_name_description
 
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 from PIL import Image
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.applications.resnet50 import ResNet50
-import tensorflow as tf
 
 current_address = Path(__file__)
 IMAGES_PATH = current_address.parents[1] / "data" / 'images'
@@ -17,24 +19,38 @@ names_arrays_path = arrays_path/'arr_text_names.npy'
 descriptions_arrays_path = arrays_path/'arr_text_descriptions.npy'
 tabular_dataset_path = arrays_path/'data.csv'
 
-def vectorize_image(row):
-    img_url = row['image url']
-    image = Image.open(IMAGES_PATH / img_url)
-    image = np.array(image)
-    lst_= [tf.image.resize(image,size=(224,224))]
-    model = ResNet50(include_top=True,input_shape=(224, 224, 3))
-
-    ar = np.empty((1,1000))
-    for i in range(len(lst_)):
-        m = model(tf.expand_dims(lst_[i],0))
-        ar = np.concatenate([ar,m])
-    return ar
-
 def calculate_price_diff(row_rec,df):
+    """Calculate difference in price for a row and the existing data
+
+    Parameters
+    ----------
+    row_rec : pd.DataFrame
+        the reference row
+    df : pd.DataFrame
+        data created for recommendations
+
+    Returns
+    -------
+    pd.DataFrame
+        the resulting exponential difference for each row
+    """
     price_diff = df['price'].apply(lambda x:(np.exp((x-row_rec['price'])/df['price'].max())))
     return price_diff
 
 def make_store_and_brand_binary(row,df):
+    """compare brand and store columns of the row and the existing data
+
+    Parameters
+    ----------
+    row_rec : pd.DataFrame
+        the reference row
+    df : pd.DataFrame
+        data created for recommendations
+
+    Returns
+    -------
+    pd.DataFrame
+    """
     store = row['store']
     brand = row['brand']
     store_match = (df['store']==store).astype(int).rename('store_match')
@@ -44,11 +60,32 @@ def make_store_and_brand_binary(row,df):
     return total_match
 
 def compute_cosine(vec_rec,matrix):
+    """Compute cosine similarity between a vector rows of a matrix
+
+    Parameters
+    ----------
+    vec_rec : np.ndarray
+    matrix : np.ndarray
+
+    Returns
+    -------
+    np.ndarray
+    """
     cos_df = cosine_similarity([vec_rec],matrix)
     cos_df = np.squeeze(cos_df)
     return cos_df
 
 def clean_tabular(data):
+    """remove break line characters from the scraped strings
+
+    Parameters
+    ----------
+    data : pd.DataFrame
+
+    Returns
+    -------
+    pd.DataFrame
+    """
     data = data.dropna()
     data["item description"] = data["item description"].apply(lambda x : x.replace("\n\n\n", " "))
     data["item description"] = data["item description"].apply(lambda x : x.replace("\n", " "))
@@ -57,13 +94,17 @@ def clean_tabular(data):
     return data
 
 class Recommender:
-    def __init__(
+    """Class implementing recommendation logic using the stored data
+    """
+    def __init__(        
         self,
         name_array_path = names_arrays_path,
         description_array_path =descriptions_arrays_path,
         image_array_path = images_arrays_path,
         tabular_path = tabular_dataset_path,
         weights = [1/6]*6):
+        """initialize the class with the given weights for each component
+        """
     
         with open(name_array_path,'rb') as f:
             self.name_array = np.load(f,allow_pickle=True)
@@ -79,6 +120,17 @@ class Recommender:
         # self.model = build_model()
 
     def predict(self,row_number):
+        """return the most similar items to the given row in the existing data
+
+        Parameters
+        ----------
+        row_number : int
+
+        Returns
+        -------
+        pd.DataFrmae
+            the most similar items
+        """
         row = self.tabular.iloc[row_number]
         
         prices = calculate_price_diff(row,self.tabular)
