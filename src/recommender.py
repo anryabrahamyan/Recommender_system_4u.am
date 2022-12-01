@@ -102,7 +102,7 @@ class Recommender:
         description_array_path =descriptions_arrays_path,
         image_array_path = images_arrays_path,
         tabular_path = tabular_dataset_path,
-        weights = [1/6]*6):
+        weights = [0.1/6, 0.9/6, 2/6, 0.5/6, 1.5/6, 1/6]):
         """initialize the class with the given weights for each component
         """
     
