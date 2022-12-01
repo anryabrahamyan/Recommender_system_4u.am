@@ -96,7 +96,7 @@ def clean_tabular(data):
 class Recommender:
     """Class implementing recommendation logic using the stored data
     """
-    def __init__(        
+    def __init__(
         self,
         name_array_path = names_arrays_path,
         description_array_path =descriptions_arrays_path,
@@ -105,7 +105,7 @@ class Recommender:
         weights = [0.1/6, 0.9/6, 2/6, 0.5/6, 1.5/6, 1/6]):
         """initialize the class with the given weights for each component
         """
-    
+
         with open(name_array_path,'rb') as f:
             self.name_array = np.load(f,allow_pickle=True)
         
@@ -132,18 +132,19 @@ class Recommender:
             the most similar items
         """
         row = self.tabular.iloc[row_number]
-        
+
         prices = calculate_price_diff(row,self.tabular)
-        print('prices done')
         store_and_brand_match = make_store_and_brand_binary(row,self.tabular)
-        print('store and brand done')
         name_similarities = compute_cosine(self.name_array[row_number,:],self.name_array)
-        print('names done')
-        description_similarities = compute_cosine(self.descriptions_array[row_number,:],self.descriptions_array)
-        print('descriptions done')
-        images_similarities = compute_cosine(self.images_array[row_number,:],self.images_array)
-        print(images_similarities)
-        print('images done')
+        description_similarities = compute_cosine(
+            self.descriptions_array[row_number,:],
+            self.descriptions_array
+            )
+        try:
+            images_similarities = compute_cosine(self.images_array[row_number,:],self.images_array)
+        except IndexError:
+            images_similarities = compute_cosine(np.array([0]*1000),self.images_array)
+
 
         dataset = self.tabular.copy(deep = True)
 

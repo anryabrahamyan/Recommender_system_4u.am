@@ -1,18 +1,21 @@
 """
 File for Generating the data necessart for recommender class
 """
+import os
+import urllib.parse
+from os import path
+from pathlib import Path
+import pickle
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+import numpy as np
 import pandas as pd
 import requests
-from os import path
-import urllib.parse
-import numpy as np
+import tensorflow as tf
 from PIL import Image
 from tensorflow.keras.applications.resnet50 import ResNet50
 from transformers import RobertaTokenizer, TFRobertaModel
-import os
-import tensorflow as tf
-from pathlib import Path
-
 
 current_address = Path(__file__)
 IMAGES_PATH = current_address.parents[1] / "data" / 'images'
@@ -58,10 +61,15 @@ def vectorize_images():
         array of all of the vectors
     """
     lst = []
+    names = []
     for image in os.listdir(IMAGES_PATH):
         i = Image.open(IMAGES_PATH / image)
         i = np.array(i)
         lst.append(i)
+        names.append(image)
+
+    name_image_mapping = dict()
+    image_names_duplicated = data['image url'].apply(lambda x:x.split('/')[-1])
 
     lst_= [tf.image.resize(img,size=(224,224)) for img in lst]
     model = ResNet50(include_top=True,input_shape=(224, 224, 3))
@@ -71,7 +79,17 @@ def vectorize_images():
     for i in range(len(lst_)):
         m = model(tf.expand_dims(lst_[i],0))
         ar = np.concatenate([ar,m])
-    return ar
+        name_image_mapping[image_names_duplicated.to_list()[i]] = m.numpy()
+
+    name_image_mapping['NaN'] = np.nan
+    prep = data['image url']\
+        .apply(lambda x:str(x).split('/')[-1])\
+        .map(name_image_mapping,na_action = 'ignore')
+
+    prep = prep[~prep.isna()]
+    prep = np.squeeze(np.stack(prep.to_list(),axis = 1))
+
+    return prep
 
 
 def roberta_encode(texts, tokenizer):
@@ -189,6 +207,7 @@ def create_data():
     with open(DATA_PATH / 'arr_images.npy', 'wb') as f:
         np.save(f, vectorize_images())
     vectors_name_desc = vectorize_name_description()
+
     with open(DATA_PATH /'arr_text_names.npy', 'wb') as f:
         np.save(f, vectors_name_desc[1])
 
