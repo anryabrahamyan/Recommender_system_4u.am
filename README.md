@@ -13,7 +13,7 @@ pip install pandas
 
 In order to run the code:
 ```python
-python app.py
+python index.py
 ```
 
 ## Low-Fidelity Mockup
@@ -23,6 +23,10 @@ You can find the skeleton of the future app [here](https://www.figma.com/file/sC
 ## Roadmap
 
 You can find the roadmap of our project [here]( https://www.figma.com/file/CreZVKPt76Gb8v86KLdRwE/Group-5-Roadmap?node-id=0%3A1).
+
+## Design
+
+You can find the design of our project [here]( https://www.figma.com/file/CreZVKPt76Gb8v86KLdRwE/Group-5-Roadmap?node-id=307%3A9&t=Kk8LqL4gd7vYrCoP-1).
 
 ## Recommendation system Testing
 
@@ -66,4 +70,4 @@ data, in order to change it, just put your desired number(0-296) instead of 0 in
 ```python 
 print(rec.predict(0)) 
 ```
-The Figma Design Link https://www.figma.com/file/CreZVKPt76Gb8v86KLdRwE/Group-5-Roadmap?node-id=307%3A9&t=Kk8LqL4gd7vYrCoP-1
+
