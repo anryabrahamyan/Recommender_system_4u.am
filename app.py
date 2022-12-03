@@ -1,10 +1,6 @@
 import dash
-from dash import dcc, ctx
-from dash import html
-import pandas as pd
-import dash_daq as daq
 import dash_bootstrap_components as dbc
-from dash.dependencies import Output, Input
+
 
 external_stylesheets = [
     dbc.themes.BOOTSTRAP,
