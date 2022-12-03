@@ -39,6 +39,7 @@ revenue_per_minute = round(df3["ItemID_y"].sum() / df3["time spent on item"].sum
 df["price"] = df["price"].str.replace(",", "").astype(int)
 df_ = df.groupby('category')["price"].sum()
 df_ = df_.reset_index()
+df_ = df_.sort_values("price")
 fig1 = px.bar(df_, x="price", y="category", title="Revenue by category")
 
 # modifications for the figure 2
