@@ -11,3 +11,6 @@ transformers==4.24.0
 gunicorn==20.1.0
 plotly~=5.11.0
 dash-bootstrap-components
+dash-renderer
+dash-html-components
+

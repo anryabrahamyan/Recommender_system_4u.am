@@ -4,6 +4,8 @@ from dash import html
 from pages import page1, page2, page0
 from app import app, server
 import dash_bootstrap_components as dbc
+import dash_core_components as dcc
+import dash_html_components as html
 from dash.dependencies import Output, Input
 from componentss import navbar
 
@@ -11,7 +13,7 @@ from componentss import navbar
 nav = navbar.Navbar()
 
 # defining the layout
-app.layout = html.Div([
+app.layout = html.Div(children = [
     dbc.Row([
         dcc.Location(id='url', refresh=False),
         dbc.Col(html.Img(src=r'assets/logo.jpg', alt='image', height=70)),
@@ -35,4 +37,4 @@ def display_page(pathname):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, port=8080)
+    app.run_server(debug=False, port=8080)
