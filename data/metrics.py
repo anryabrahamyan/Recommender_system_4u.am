@@ -63,7 +63,6 @@ fig3 = px.bar_polar(df2_, r="ItemID", theta="store",
 df3_ = df0.groupby(['ItemID', 'product'])['ItemID'].count().reset_index(name='Total Amount')
 df3_ = df3_.sort_values('Total Amount', ascending=False).head(10)[['product', 'Total Amount']]
 fig4 = px.bar(df3_, x="product", y="Total Amount", title="Top 10 recommended Items")
-fig4.update_xaxes(tickangle=35)
-fig4.update_layout(font=dict(size=8))
+fig4.update_xaxes(showticklabels=False)
 
 
