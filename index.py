@@ -2,7 +2,7 @@
 from dash import dcc, ctx
 from dash import html
 from pages import page1, page2, page0
-from app import app
+from app import app, server
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input
 from componentss import navbar
