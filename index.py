@@ -17,7 +17,7 @@ dash.register_page(__name__, path='/')
 nav = navbar.Navbar()
 
 # defining the layout
-layout = html.Div(children = [
+app.layout = html.Div(children = [
     dbc.Row([
         dcc.Location(id='url', refresh=False),
         dbc.Col(html.Img(src=r'assets/logo.jpg', alt='image', height=70)),
