@@ -1,4 +1,5 @@
 # Importing necessary libraries
+import dash
 from dash import dcc, ctx
 from dash import html
 from pages import page1, page2, page0
@@ -8,6 +9,9 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Output, Input
 from componentss import navbar
+
+
+dash.register_page(__name__, path='/')
 
 # calling the navigation bar with buttons
 nav = navbar.Navbar()
