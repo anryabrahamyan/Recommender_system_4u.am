@@ -8,8 +8,8 @@ df = pd.read_csv('data/data.csv')
 df2 = pd.read_csv("data/sample.csv")
 # comment the above 2 rows and uncomment the below 2 rows
 # if you want to specifically run the metrics.py
-# df = pd.read_csv('data.csv')
-# df2 = pd.read_csv("sample.csv")
+#df = pd.read_csv('data.csv')
+#df2 = pd.read_csv("sample.csv")
 
 # defining the metrics for cards
 df2["time spent on item"] = np.random.rand(len(df2)) * 100 + 5
@@ -58,3 +58,11 @@ df2_ = df2_.sort_values('ItemID', ascending=False).head(10)[['store', 'ItemID']]
 fig3 = px.bar_polar(df2_, r="ItemID", theta="store",
                     color="ItemID",
                     color_discrete_sequence=px.colors.sequential.Plasma_r, title='Recommended Count per Store')
+
+# modifications for the figure 4
+df3_ = df0.groupby(['ItemID', 'product'])['ItemID'].count().reset_index(name='Total Amount')
+df3_ = df3_.sort_values('Total Amount', ascending=False).head(10)[['product', 'Total Amount']]
+fig4 = px.bar(df3_, x="product", y="Total Amount", title="Top 10 recommended Items")
+fig4.update_xaxes(showticklabels=False)
+
+

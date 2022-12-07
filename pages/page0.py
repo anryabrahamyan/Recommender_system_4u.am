@@ -6,10 +6,10 @@ import dash_bootstrap_components as dbc
 
 # defining the card contents
 card_content1 = [
-    dbc.CardHeader("Average Time Spent in Website"),
+    dbc.CardHeader("Avg Time Spent in Website"),
     dbc.CardBody(
         [
-            html.H5(average_time, className="info"),
+            html.H5(f'{average_time:,}', className="info"),
 
         ]
     ),
@@ -19,7 +19,7 @@ card_content2 = [
     dbc.CardHeader("Total Revenue Gain"),
     dbc.CardBody(
         [
-            html.H5(total_revenue, className="info"),
+            html.H5(f'{total_revenue:,}', className="info"),
 
         ]
     ),
@@ -29,7 +29,7 @@ card_content3 = [
     dbc.CardHeader("Revenue per Click"),
     dbc.CardBody(
         [
-            html.H5(revenue_per_click, className="info"),
+            html.H5(f'{revenue_per_click:,}', className="info"),
 
         ]
     ),
@@ -39,7 +39,7 @@ card_content4 = [
     dbc.CardHeader("The rate of 'add to cart and buy'"),
     dbc.CardBody(
         [
-            html.H5(add_to_cart_rate, className="info"),
+            html.H5(f'{add_to_cart_rate:,}', className="info"),
 
         ]
     ),
@@ -49,7 +49,7 @@ card_content5 = [
     dbc.CardHeader("Revenue per minute"),
     dbc.CardBody(
         [
-            html.H5(revenue_per_minute, className="info"),
+            html.H5(f'{revenue_per_minute:,}', className="info"),
 
         ]
     ),
@@ -59,7 +59,7 @@ card_content6 = [
     dbc.CardHeader("Conversion Rate"),
     dbc.CardBody(
         [
-            html.H5(conversion_rate, className="info"),
+            html.H5(f'{conversion_rate:,}', className="info"),
 
         ]
     ),
@@ -67,6 +67,7 @@ card_content6 = [
 
 # turning the cards into two rows
 row_1 = dbc.Row(
+
     [
         dbc.Col(dbc.Card(card_content1, color="primary", outline=True), width=3),
         dbc.Col(dbc.Card(card_content2, color="secondary", outline=True), width=3),
@@ -93,4 +94,5 @@ layout = html.Div([
                       )  # figure 1 called from metrics
         ]
         ),
-    ])]),
+    ]),
+    dbc.Row(dcc.Graph(figure=fig4))]),
