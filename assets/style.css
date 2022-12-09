@@ -77,3 +77,10 @@ body {
     color: #079A82;
 }
 
+.mb-4 {
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  background-size: cover;
+  width: 690px;
+  height: 200px;
+}
