@@ -6,6 +6,7 @@ from app import app
 import dash_bootstrap_components as dbc
 from dash.dependencies import Output, Input
 from componentss import navbar
+import os
 
 # calling the navigation bar with buttons
 nav = navbar.Navbar()
@@ -35,4 +36,4 @@ def display_page(pathname):
 
 
 if __name__ == "__main__":
-    app.run_server(debug=True, port=8080,host ='0.0.0.0')
+    app.run_server(debug=False, port=int(os.getenv("PORT")),host ='0.0.0.0')
